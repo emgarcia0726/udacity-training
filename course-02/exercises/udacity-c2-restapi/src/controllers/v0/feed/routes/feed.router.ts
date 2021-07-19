@@ -16,15 +16,63 @@ router.get('/', async (req: Request, res: Response) => {
     res.send(items);
 });
 
-//@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get('/:id', async (req: Request, res: Response) => {
+    let { id } = req.params;
+
+    if ( !id ) {
+        return res.status(400)
+                  .send(`ID is required`);
+    }
+
+    const item = await FeedItem.findByPk(id);
+
+    if (!item){
+        return res.status(404)
+                  .send(`No item with that ID`);
+    }
+    return res.status(200)
+                  .send(item);
+
+});
 
 // update a specific resource
 router.patch('/:id', 
-    requireAuth, 
+    requireAuth,
     async (req: Request, res: Response) => {
-        //@TODO try it yourself
-        res.send(500).send("not implemented")
+        let { id } = req.params;
+        let { caption, url} = req.body;
+
+        if ( !id ) {
+            return res.status(400).send(`ID is required`);
+        }
+
+        const item = await FeedItem.findByPk(id);
+
+        if (!item){
+            return res.status(404)
+                      .send(`No item with that ID`);
+        }
+
+        if ( !caption && !url ) {
+            return res.status(400).send('At least 1 attribute is required to update.');
+        }
+
+        if (caption) {
+            await FeedItem.update({ caption: caption }, {
+                where: {
+                    id: id
+                }});
+        }
+
+        if (url) {
+            await FeedItem.update({ url: url }, {
+                where: {
+                    id: id
+                }});
+        }
+        
+        return res.status(204);
 });
 
 

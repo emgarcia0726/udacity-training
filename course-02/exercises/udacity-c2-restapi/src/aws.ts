@@ -4,7 +4,7 @@ import { config } from './config/config';
 const c = config.dev;
 
 //Configure AWS
-var credentials = new AWS.SharedIniFileCredentials({profile: 'default'});
+var credentials = new AWS.SharedIniFileCredentials({profile: c.aws_profile});
 AWS.config.credentials = credentials;
 
 export const s3 = new AWS.S3({
@@ -13,6 +13,7 @@ export const s3 = new AWS.S3({
   params: {Bucket: c.aws_media_bucket}
 });
 
+if(c.aws_profile !== "DEPLOYED") { var credentials = new AWS.SharedIniFileCredentials({profile: 'default'}); AWS.config.credentials = credentials; }
 
 /* getGetSignedUrl generates an aws signed url to retreive an item
  * @Params
